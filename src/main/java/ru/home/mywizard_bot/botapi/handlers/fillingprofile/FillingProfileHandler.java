@@ -1,5 +1,6 @@
 package ru.home.mywizard_bot.botapi.handlers.fillingprofile;
 
+import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -12,7 +13,6 @@ import ru.home.mywizard_bot.cache.UserDataCache;
 import ru.home.mywizard_bot.model.UserProfileData;
 import ru.home.mywizard_bot.service.PredictionService;
 import ru.home.mywizard_bot.service.ReplyMessagesService;
-import ru.home.mywizard_bot.utils.Emojis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,54 +61,48 @@ public class FillingProfileHandler implements InputMessageHandler {
 
         if (botState.equals(BotState.ASK_NAME)) {
             replyToUser = messagesService.getReplyMessage(chatId, "reply.askName");
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_AGE);
+            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_LAST_NAME);
         }
 
-        if (botState.equals(BotState.ASK_AGE)) {
+        if (botState.equals(BotState.ASK_LAST_NAME)) {
             profileData.setName(usersAnswer);
-            replyToUser = messagesService.getReplyMessage(chatId, "reply.askAge");
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_GENDER);
+            replyToUser = messagesService.getReplyMessage(chatId, "reply.askLastName");
+            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_COUNTRY);
         }
 
-        if (botState.equals(BotState.ASK_GENDER)) {
-            profileData.setAge(Integer.parseInt(usersAnswer));
-            replyToUser = messagesService.getReplyMessage(chatId, "reply.askGender");
+        if (botState.equals(BotState.ASK_COUNTRY)) {
+            replyToUser = messagesService.getReplyMessage(chatId, "askCountry");
+            profileData.setNumber(Integer.parseInt(usersAnswer));
+
             replyToUser.setReplyMarkup(getGenderButtonsMarkup());
+
+            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_ADRES);
+        }
+
+        if (botState.equals(BotState.ASK_ADRES)) {
+            profileData.setLastname((usersAnswer));
+            replyToUser = messagesService.getReplyMessage(chatId, "reply.askAdres");
+            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_NUMBER);
+
+//            replyToUser.setReplyMarkup(getGenderButtonsMarkup());
         }
 
         if (botState.equals(BotState.ASK_NUMBER)) {
             replyToUser = messagesService.getReplyMessage(chatId, "reply.askNumber");
-            profileData.setGender(usersAnswer);
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_COLOR);
-        }
-
-        if (botState.equals(BotState.ASK_COLOR)) {
-            replyToUser = messagesService.getReplyMessage(chatId, "reply.askColor");
-            profileData.setNumber(Integer.parseInt(usersAnswer));
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_MOVIE);
-        }
-
-        if (botState.equals(BotState.ASK_MOVIE)) {
-            replyToUser = messagesService.getReplyMessage(chatId, "reply.askMovie");
-            profileData.setColor(usersAnswer);
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_SONG);
-        }
-
-        if (botState.equals(BotState.ASK_SONG)) {
-            replyToUser = messagesService.getReplyMessage(chatId, "reply.askSong");
-            profileData.setMovie(usersAnswer);
+            profileData.setAdres(usersAnswer);
             userDataCache.setUsersCurrentBotState(userId, BotState.PROFILE_FILLED);
         }
+
 
         if (botState.equals(BotState.PROFILE_FILLED)) {
             profileData.setSong(usersAnswer);
             userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_MAIN_MENU);
 
             String profileFilledMessage = messagesService.getReplyText("reply.profileFilled",
-                    profileData.getName(), Emojis.SPARKLES);
+                    profileData.getName(), EmojiParser.parseToUnicode(":sparkles:"));
             String predictionMessage = predictionService.getPrediction();
 
-            replyToUser = new SendMessage(chatId, String.format("%s%n%n%s %s", profileFilledMessage, Emojis.SCROLL, predictionMessage));
+            replyToUser = new SendMessage(chatId, String.format("%s%n%n%s %s", profileFilledMessage, EmojiParser.parseToUnicode(":scroll:"), predictionMessage));
             replyToUser.setParseMode("HTML");
         }
 

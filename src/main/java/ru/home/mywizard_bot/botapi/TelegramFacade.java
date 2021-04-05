@@ -2,6 +2,7 @@ package ru.home.mywizard_bot.botapi;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
@@ -11,15 +12,14 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.home.mywizard_bot.MyWizardTelegramBot;
 import ru.home.mywizard_bot.cache.UserDataCache;
 import ru.home.mywizard_bot.model.UserProfileData;
 import ru.home.mywizard_bot.service.MainMenuService;
 import ru.home.mywizard_bot.service.ReplyMessagesService;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.*;
 
 /**
  * @author Sergei Viacheslaev
@@ -32,6 +32,7 @@ public class TelegramFacade {
     private MainMenuService mainMenuService;
     private MyWizardTelegramBot myWizardBot;
     private ReplyMessagesService messagesService;
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(TelegramFacade.class);
 
     public TelegramFacade(BotStateContext botStateContext, UserDataCache userDataCache, MainMenuService mainMenuService,
                           @Lazy MyWizardTelegramBot myWizardBot, ReplyMessagesService messagesService) {
@@ -42,7 +43,7 @@ public class TelegramFacade {
         this.messagesService = messagesService;
     }
 
-    public BotApiMethod<?> handleUpdate(Update update) {
+    public BotApiMethod<?> handleUpdate(Update update) throws IOException, TelegramApiException {
         SendMessage replyMessage = null;
 
         if (update.hasCallbackQuery()) {
@@ -64,7 +65,7 @@ public class TelegramFacade {
     }
 
 
-    private SendMessage handleInputMessage(Message message) {
+    private SendMessage handleInputMessage(Message message) throws IOException, TelegramApiException {
         String inputMsg = message.getText();
         int userId = message.getFrom().getId();
         long chatId = message.getChatId();
@@ -74,16 +75,16 @@ public class TelegramFacade {
         switch (inputMsg) {
             case "/start":
                 botState = BotState.ASK_DESTINY;
-                myWizardBot.sendPhoto(chatId, messagesService.getReplyText("reply.hello"), "static/images/wizard_logo.jpg");
+                myWizardBot.sendPhoto(chatId, messagesService.getReplyText("reply.hello"), "static/images/press.jpg");
                 break;
-            case "Получить предсказание":
+            case "Заполнить данные для доставки":
                 botState = BotState.FILLING_PROFILE;
                 break;
-            case "Моя анкета":
+            case "Мои данные":
                 botState = BotState.SHOW_USER_PROFILE;
                 break;
-            case "Скачать анкету":
-                myWizardBot.sendDocument(chatId, "Ваша анкета", getUsersProfile(userId));
+            case "Скачать счет":
+                myWizardBot.sendDocument(chatId, "Ваш счет сэр", getUsersProfile(userId));
                 botState = BotState.SHOW_USER_PROFILE;
                 break;
             case "Помощь":
@@ -102,7 +103,7 @@ public class TelegramFacade {
     }
 
 
-    private BotApiMethod<?> processCallbackQuery(CallbackQuery buttonQuery) {
+    private BotApiMethod<?> processCallbackQuery(CallbackQuery buttonQuery) throws FileNotFoundException, TelegramApiException {
         final long chatId = buttonQuery.getMessage().getChatId();
         final int userId = buttonQuery.getFrom().getId();
         BotApiMethod<?> callBackAnswer = mainMenuService.getMainMenuMessage(chatId, "Воспользуйтесь главным меню");
@@ -110,12 +111,13 @@ public class TelegramFacade {
 
         //From Destiny choose buttons
         if (buttonQuery.getData().equals("buttonYes")) {
-            callBackAnswer = new SendMessage(chatId, "Как тебя зовут ?");
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_AGE);
+            callBackAnswer = new SendMessage(chatId, "Тогда заполним данные для доставки. Как тебя зовут ?");
+            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_LAST_NAME);
         } else if (buttonQuery.getData().equals("buttonNo")) {
-            callBackAnswer = sendAnswerCallbackQuery("Возвращайся, когда будешь готов", false, buttonQuery);
+            callBackAnswer = sendAnswerCallbackQuery("Тогда иди гуляй", false, buttonQuery);
         } else if (buttonQuery.getData().equals("buttonIwillThink")) {
-            callBackAnswer = sendAnswerCallbackQuery("Данная кнопка не поддерживается", true, buttonQuery);
+            callBackAnswer = sendAnswerCallbackQuery("Чтобы лучше думалось посмотри на это", true, buttonQuery);
+            myWizardBot.sendPhoto(chatId, messagesService.getReplyText("reply.rosin"), "static/images/rosin.jpg");
         }
 
         //From Gender choose buttons
@@ -152,7 +154,7 @@ public class TelegramFacade {
     }
 
     @SneakyThrows
-    public File getUsersProfile(int userId) {
+    public File getUsersProfile(int userId) throws IOException {
         UserProfileData userProfileData = userDataCache.getUserProfileData(userId);
         File profileFile = ResourceUtils.getFile("classpath:static/docs/users_profile.txt");
 

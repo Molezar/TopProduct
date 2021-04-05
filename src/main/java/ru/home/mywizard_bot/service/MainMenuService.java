@@ -37,9 +37,9 @@ public class MainMenuService {
         KeyboardRow row1 = new KeyboardRow();
         KeyboardRow row2 = new KeyboardRow();
         KeyboardRow row3 = new KeyboardRow();
-        row1.add(new KeyboardButton("Получить предсказание"));
-        row2.add(new KeyboardButton("Моя анкета"));
-        row2.add(new KeyboardButton("Скачать анкету"));
+        row1.add(new KeyboardButton("Заполнить данные для доставки"));
+        row2.add(new KeyboardButton("Мои данные"));
+        row2.add(new KeyboardButton("Скачать счет"));
         row3.add(new KeyboardButton("Помощь"));
         keyboard.add(row1);
         keyboard.add(row2);
