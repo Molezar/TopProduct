@@ -121,7 +121,7 @@ public class FillingProfileHandler implements InputMessageHandler {
 
     private InlineKeyboardMarkup getOplatilButtonMarkup() {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        InlineKeyboardButton buttonOplatil = new InlineKeyboardButton().setText("А где эта долбаная кнопка?how");
+        InlineKeyboardButton buttonOplatil = new InlineKeyboardButton().setText("А где эта долбаная кнопка?");
         buttonOplatil.setCallbackData("oplatil");
         List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
         keyboardButtonsRow1.add(buttonOplatil);
