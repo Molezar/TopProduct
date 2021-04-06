@@ -120,20 +120,19 @@ public class TelegramFacade {
             myWizardBot.sendPhoto(chatId, messagesService.getReplyText("reply.rosin"), "static/images/rosin.jpg");
         }
 
-        //From Gender choose buttons
-        else if (buttonQuery.getData().equals("buttonMan")) {
+        //From Country choose buttons
+        else if (buttonQuery.getData().equals("buttonUkr")) {
             UserProfileData userProfileData = userDataCache.getUserProfileData(userId);
-            userProfileData.setGender("М");
+            userProfileData.setCountry("Украина");
             userDataCache.saveUserProfileData(userId, userProfileData);
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_COLOR);
-            callBackAnswer = new SendMessage(chatId, "Твоя любимая цифра");
-        } else if (buttonQuery.getData().equals("buttonWoman")) {
+            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_NUMBER);
+            callBackAnswer = new SendMessage(chatId, "Полный адрес для доставки, твоя хата или склад доставщика");
+        } else if (buttonQuery.getData().equals("buttonRus")) {
             UserProfileData userProfileData = userDataCache.getUserProfileData(userId);
-            userProfileData.setGender("Ж");
+            userProfileData.setCountry("Россия");
             userDataCache.saveUserProfileData(userId, userProfileData);
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_COLOR);
-            callBackAnswer = new SendMessage(chatId, "Твоя любимая цифра");
-
+            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_NUMBER);
+            callBackAnswer = new SendMessage(chatId, "Полный адрес для доставки, твоя хата или склад доставщика");
         } else {
             userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_MAIN_MENU);
         }

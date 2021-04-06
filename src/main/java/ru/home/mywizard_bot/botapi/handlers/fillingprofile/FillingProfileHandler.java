@@ -2,18 +2,23 @@ package ru.home.mywizard_bot.botapi.handlers.fillingprofile;
 
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.home.mywizard_bot.MyWizardTelegramBot;
 import ru.home.mywizard_bot.botapi.BotState;
 import ru.home.mywizard_bot.botapi.InputMessageHandler;
+import ru.home.mywizard_bot.botapi.TelegramFacade;
 import ru.home.mywizard_bot.cache.UserDataCache;
 import ru.home.mywizard_bot.model.UserProfileData;
 import ru.home.mywizard_bot.service.PredictionService;
 import ru.home.mywizard_bot.service.ReplyMessagesService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,16 +33,23 @@ public class FillingProfileHandler implements InputMessageHandler {
     private UserDataCache userDataCache;
     private ReplyMessagesService messagesService;
     private PredictionService predictionService;
+    private TelegramFacade telegramFacade;
+    private MyWizardTelegramBot myWizardBot;
 
-    public FillingProfileHandler(UserDataCache userDataCache, ReplyMessagesService messagesService,
-                                 PredictionService predictionService) {
+
+    public FillingProfileHandler( UserDataCache userDataCache, ReplyMessagesService messagesService,
+                                  PredictionService predictionService, @Lazy TelegramFacade telegramFacade,
+                                  @Lazy MyWizardTelegramBot myWizardBot) {
         this.userDataCache = userDataCache;
         this.messagesService = messagesService;
         this.predictionService = predictionService;
+        this.telegramFacade = telegramFacade;
+        this.myWizardBot = myWizardBot;
+
     }
 
     @Override
-    public SendMessage handle(Message message) {
+    public SendMessage handle(Message message) throws IOException, TelegramApiException {
         if (userDataCache.getUsersCurrentBotState(message.getFrom().getId()).equals(BotState.FILLING_PROFILE)) {
             userDataCache.setUsersCurrentBotState(message.getFrom().getId(), BotState.ASK_NAME);
         }
@@ -49,7 +61,7 @@ public class FillingProfileHandler implements InputMessageHandler {
         return BotState.FILLING_PROFILE;
     }
 
-    private SendMessage processUsersInput(Message inputMsg) {
+    private SendMessage processUsersInput(Message inputMsg) throws IOException, TelegramApiException {
         String usersAnswer = inputMsg.getText();
         int userId = inputMsg.getFrom().getId();
         long chatId = inputMsg.getChatId();
@@ -71,31 +83,20 @@ public class FillingProfileHandler implements InputMessageHandler {
         }
 
         if (botState.equals(BotState.ASK_COUNTRY)) {
-            replyToUser = messagesService.getReplyMessage(chatId, "askCountry");
-            profileData.setNumber(Integer.parseInt(usersAnswer));
+            profileData.setLastName(usersAnswer);
+            replyToUser = messagesService.getReplyMessage(chatId, "reply.askCountry");
+            replyToUser.setReplyMarkup(getCountryButtonsMarkup());
 
-            replyToUser.setReplyMarkup(getGenderButtonsMarkup());
-
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_ADRES);
-        }
-
-        if (botState.equals(BotState.ASK_ADRES)) {
-            profileData.setLastname((usersAnswer));
-            replyToUser = messagesService.getReplyMessage(chatId, "reply.askAdres");
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_NUMBER);
-
-//            replyToUser.setReplyMarkup(getGenderButtonsMarkup());
         }
 
         if (botState.equals(BotState.ASK_NUMBER)) {
-            replyToUser = messagesService.getReplyMessage(chatId, "reply.askNumber");
             profileData.setAdres(usersAnswer);
+            replyToUser = messagesService.getReplyMessage(chatId, "reply.askNumber");
             userDataCache.setUsersCurrentBotState(userId, BotState.PROFILE_FILLED);
         }
 
-
         if (botState.equals(BotState.PROFILE_FILLED)) {
-            profileData.setSong(usersAnswer);
+            profileData.setNumber(usersAnswer);
             userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_MAIN_MENU);
 
             String profileFilledMessage = messagesService.getReplyText("reply.profileFilled",
@@ -104,25 +105,25 @@ public class FillingProfileHandler implements InputMessageHandler {
 
             replyToUser = new SendMessage(chatId, String.format("%s%n%n%s %s", profileFilledMessage, EmojiParser.parseToUnicode(":scroll:"), predictionMessage));
             replyToUser.setParseMode("HTML");
+            myWizardBot.sendDocument(chatId, "Ваш счет сэр", telegramFacade.getUsersProfile(userId));
         }
 
         userDataCache.saveUserProfileData(userId, profileData);
-
         return replyToUser;
     }
 
-    private InlineKeyboardMarkup getGenderButtonsMarkup() {
+    private InlineKeyboardMarkup getCountryButtonsMarkup() {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        InlineKeyboardButton buttonGenderMan = new InlineKeyboardButton().setText("М");
-        InlineKeyboardButton buttonGenderWoman = new InlineKeyboardButton().setText("Ж");
+        InlineKeyboardButton buttonUkr = new InlineKeyboardButton().setText("Украина");
+        InlineKeyboardButton buttonRus = new InlineKeyboardButton().setText("Россия");
 
         //Every button must have callBackData, or else not work !
-        buttonGenderMan.setCallbackData("buttonMan");
-        buttonGenderWoman.setCallbackData("buttonWoman");
+        buttonUkr.setCallbackData("buttonUkr");
+        buttonRus.setCallbackData("buttonRus");
 
         List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
-        keyboardButtonsRow1.add(buttonGenderMan);
-        keyboardButtonsRow1.add(buttonGenderWoman);
+        keyboardButtonsRow1.add(buttonUkr);
+        keyboardButtonsRow1.add(buttonRus);
 
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
         rowList.add(keyboardButtonsRow1);
@@ -131,8 +132,6 @@ public class FillingProfileHandler implements InputMessageHandler {
 
         return inlineKeyboardMarkup;
     }
-
-
 }
 
 

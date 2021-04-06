@@ -17,14 +17,15 @@ public class UserProfileData implements Serializable {
     String accountname;
     String name;
     String lastname;
+    String country;
     String adres;
-    int number;
+    String number;
 
-    public String getAccountname() {
+    public String getAccountName() {
         return accountname;
     }
 
-    public void setAccountname(String accountname) {
+    public void setAccountName(String accountname) {
         this.accountname = accountname;
     }
 
@@ -40,8 +41,16 @@ public class UserProfileData implements Serializable {
         return lastname;
     }
 
-    public void setLastname(String lastname) {
+    public void setLastName(String lastname) {
         this.lastname = lastname;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 
     public String getAdres() {
@@ -52,90 +61,16 @@ public class UserProfileData implements Serializable {
         this.adres = adres;
     }
 
-    public int getNumber() {
+    public String getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(String number) {
         this.number = number;
     }
 
     @Override
     public String toString() {
-        return String.format("Имя: %s%Фамилия: %d%nГород: %s%nАдрес: %d%n" +
-                        "Номер телефона: %s%n", getName(), getLastName(), getCity(), getAdres(),
-                getNumber());
+        return String.format("Имя: %s%nФамилия: %s%nСтрана: %s%nАдрес: %s%nНомер телефона: %s%n", getName(), getLastName(), getCountry(), getAdres(), getNumber());
     }
-
-
-//    String name;
-//    String gender;
-//    String color;
-//    String movie;
-//    String song;
-//    int age;
-//    int number;
-//
-//    public String getName() {
-//        return name;
-//    }
-//
-//    public void setName(String name) {
-//        this.name = name;
-//    }
-//
-//    public String getGender() {
-//        return gender;
-//    }
-//
-//    public void setGender(String gender) {
-//        this.gender = gender;
-//    }
-//
-//    public String getColor() {
-//        return color;
-//    }
-//
-//    public void setColor(String color) {
-//        this.color = color;
-//    }
-//
-//    public String getMovie() {
-//        return movie;
-//    }
-//
-//    public void setMovie(String movie) {
-//        this.movie = movie;
-//    }
-//
-//    public String getSong() {
-//        return song;
-//    }
-//
-//    public void setSong(String song) {
-//        this.song = song;
-//    }
-//
-//    public int getAge() {
-//        return age;
-//    }
-//
-//    public void setAge(int age) {
-//        this.age = age;
-//    }
-//
-//    public int getNumber() {
-//        return number;
-//    }
-//
-//    public void setNumber(int number) {
-//        this.number = number;
-//    }
-//
-//    @Override
-//    public String toString() {
-//        return String.format("Имя: %s%nВозраст: %d%nПол: %s%nЛюбимая цифра: %d%n" +
-//                        "Цвет: %s%nФильм: %s%nПесня: %s%n", getName(), getAge(), getGender(), getNumber(),
-//                getColor(), getMovie(), getSong());
-//    }
 }

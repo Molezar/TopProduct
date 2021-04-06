@@ -52,7 +52,7 @@ public class AskDestinyHandler implements InputMessageHandler {
         InlineKeyboardButton buttonYes = new InlineKeyboardButton().setText("Да");
         InlineKeyboardButton buttonNo = new InlineKeyboardButton().setText("Нет, спасибо");
         InlineKeyboardButton buttonIwillThink = new InlineKeyboardButton().setText("Я подумаю");
-        InlineKeyboardButton buttonIdontKnow = new InlineKeyboardButton().setText("Еще не определился");
+        InlineKeyboardButton buttonIdontKnow = new InlineKeyboardButton().setText("Главное меню");
 
         //Every button must have callBackData, or else not work !
         buttonYes.setCallbackData("buttonYes");
