@@ -21,9 +21,7 @@ import ru.home.mywizard_bot.service.ReplyMessagesService;
 
 import java.io.*;
 
-/**
- * @author Sergei Viacheslaev
- */
+
 @Component
 @Slf4j
 public class TelegramFacade {
@@ -117,7 +115,7 @@ public class TelegramFacade {
             callBackAnswer = sendAnswerCallbackQuery("Тогда иди гуляй", false, buttonQuery);
         } else if (buttonQuery.getData().equals("buttonIwillThink")) {
             callBackAnswer = sendAnswerCallbackQuery("Чтобы лучше думалось посмотри на это", true, buttonQuery);
-            myWizardBot.sendPhoto(chatId, messagesService.getReplyText("reply.rosin"), "https://presstelegrambot.herokuapp.com/static/images/rosin.jpg");
+            myWizardBot.sendPhoto(chatId, messagesService.getReplyText("reply.rosin"), "static/images/rosin.jpg");
         }
 
         //From Country choose buttons
@@ -155,7 +153,7 @@ public class TelegramFacade {
     @SneakyThrows
     public File getUsersProfile(int userId) throws IOException {
         UserProfileData userProfileData = userDataCache.getUserProfileData(userId);
-        File profileFile = ResourceUtils.getFile("https://presstelegrambot.herokuapp.com/static/docs/users_profile.txt");
+        File profileFile = ResourceUtils.getFile("classpath:static/docs/users_profile.txt");
 
         try (FileWriter fw = new FileWriter(profileFile.getAbsoluteFile());
              BufferedWriter bw = new BufferedWriter(fw)) {

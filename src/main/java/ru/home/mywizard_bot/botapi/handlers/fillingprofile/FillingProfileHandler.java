@@ -111,7 +111,6 @@ public class FillingProfileHandler implements InputMessageHandler {
             replyToUser.setReplyMarkup(getOplatilButtonMarkup());
             replyToUser.setParseMode("HTML");
             myWizardBot.sendDocument(chatId, "Ваш счет сэр", telegramFacade.getUsersProfile(userId));
-//            mainMenuService.getMainMenuMessage(chatId, "Воспользуйтесь главным меню");
 
         }
 
