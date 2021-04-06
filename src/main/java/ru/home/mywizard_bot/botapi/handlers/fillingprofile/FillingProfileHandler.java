@@ -4,6 +4,7 @@ import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -15,6 +16,7 @@ import ru.home.mywizard_bot.botapi.InputMessageHandler;
 import ru.home.mywizard_bot.botapi.TelegramFacade;
 import ru.home.mywizard_bot.cache.UserDataCache;
 import ru.home.mywizard_bot.model.UserProfileData;
+import ru.home.mywizard_bot.service.MainMenuService;
 import ru.home.mywizard_bot.service.PredictionService;
 import ru.home.mywizard_bot.service.ReplyMessagesService;
 
@@ -35,16 +37,18 @@ public class FillingProfileHandler implements InputMessageHandler {
     private PredictionService predictionService;
     private TelegramFacade telegramFacade;
     private MyWizardTelegramBot myWizardBot;
+    private MainMenuService mainMenuService;
 
 
     public FillingProfileHandler( UserDataCache userDataCache, ReplyMessagesService messagesService,
                                   PredictionService predictionService, @Lazy TelegramFacade telegramFacade,
-                                  @Lazy MyWizardTelegramBot myWizardBot) {
+                                  @Lazy MyWizardTelegramBot myWizardBot, @Lazy MainMenuService mainMenuService) {
         this.userDataCache = userDataCache;
         this.messagesService = messagesService;
         this.predictionService = predictionService;
         this.telegramFacade = telegramFacade;
         this.myWizardBot = myWizardBot;
+        this.mainMenuService = mainMenuService;
 
     }
 
@@ -104,12 +108,28 @@ public class FillingProfileHandler implements InputMessageHandler {
             String predictionMessage = predictionService.getPrediction();
 
             replyToUser = new SendMessage(chatId, String.format("%s%n%n%s %s", profileFilledMessage, EmojiParser.parseToUnicode(":scroll:"), predictionMessage));
+            replyToUser.setReplyMarkup(getOplatilButtonMarkup());
             replyToUser.setParseMode("HTML");
             myWizardBot.sendDocument(chatId, "Ваш счет сэр", telegramFacade.getUsersProfile(userId));
+//            mainMenuService.getMainMenuMessage(chatId, "Воспользуйтесь главным меню");
+
         }
 
         userDataCache.saveUserProfileData(userId, profileData);
         return replyToUser;
+    }
+
+    private InlineKeyboardMarkup getOplatilButtonMarkup() {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        InlineKeyboardButton buttonOplatil = new InlineKeyboardButton().setText("А где эта долбаная кнопка?how");
+        buttonOplatil.setCallbackData("oplatil");
+        List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
+        keyboardButtonsRow1.add(buttonOplatil);
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+        rowList.add(keyboardButtonsRow1);
+        inlineKeyboardMarkup.setKeyboard(rowList);
+
+        return inlineKeyboardMarkup;
     }
 
     private InlineKeyboardMarkup getCountryButtonsMarkup() {

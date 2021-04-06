@@ -40,7 +40,7 @@ public class MainMenuService {
         row1.add(new KeyboardButton("Заполнить данные для доставки"));
         row2.add(new KeyboardButton("Мои данные"));
         row2.add(new KeyboardButton("Скачать счет"));
-        row3.add(new KeyboardButton("Помощь"));
+        row3.add(new KeyboardButton("Оплатил"));
         keyboard.add(row1);
         keyboard.add(row2);
         keyboard.add(row3);

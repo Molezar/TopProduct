@@ -20,6 +20,8 @@ public class UserProfileData implements Serializable {
     String country;
     String adres;
     String number;
+    static final String bill = "<тут будет биткоин адрес оплаты>";
+    static final double ammount = 0.01;
 
     public String getAccountName() {
         return accountname;
@@ -69,8 +71,21 @@ public class UserProfileData implements Serializable {
         this.number = number;
     }
 
+    public String getBill() {
+        return bill;
+    }
+
+//    public void setBill(String bill) {this.bill = bill;}
+
+    public double getAmmount() {return ammount;}
+
+//    public void setAmmount(double ammount) {
+//        this.ammount = ammount;
+//    }
+
+
     @Override
     public String toString() {
-        return String.format("Имя: %s%nФамилия: %s%nСтрана: %s%nАдрес: %s%nНомер телефона: %s%n", getName(), getLastName(), getCountry(), getAdres(), getNumber());
+        return String.format("Имя: %s%nФамилия: %s%nСтрана: %s%nАдрес: %s%nНомер телефона: %s%nАдрес для оплаты: %s%nСумма оплаты: %s%n", getName(), getLastName(), getCountry(), getAdres(), getNumber(), getBill(), getAmmount());
     }
 }

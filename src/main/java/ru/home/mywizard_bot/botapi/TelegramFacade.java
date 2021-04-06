@@ -87,8 +87,8 @@ public class TelegramFacade {
                 myWizardBot.sendDocument(chatId, "Ваш счет сэр", getUsersProfile(userId));
                 botState = BotState.SHOW_USER_PROFILE;
                 break;
-            case "Помощь":
-                botState = BotState.SHOW_HELP_MENU;
+            case "Оплатил":
+                botState = BotState.SHOW_PAYED_MENU;
                 break;
             default:
                 botState = userDataCache.getUsersCurrentBotState(userId);

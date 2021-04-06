@@ -11,11 +11,11 @@ import ru.home.mywizard_bot.service.ReplyMessagesService;
 
 
 @Component
-public class HelpMenuHandler implements InputMessageHandler {
+public class PayedMenuHandler implements InputMessageHandler {
     private MainMenuService mainMenuService;
     private ReplyMessagesService messagesService;
 
-    public HelpMenuHandler(MainMenuService mainMenuService, ReplyMessagesService messagesService) {
+    public PayedMenuHandler(MainMenuService mainMenuService, ReplyMessagesService messagesService) {
         this.mainMenuService = mainMenuService;
         this.messagesService = messagesService;
     }
@@ -23,11 +23,11 @@ public class HelpMenuHandler implements InputMessageHandler {
     @Override
     public SendMessage handle(Message message) {
         return mainMenuService.getMainMenuMessage(message.getChatId(),
-                messagesService.getReplyText("reply.showHelpMenu", EmojiParser.parseToUnicode(":mage:")));
+                messagesService.getReplyText("reply.showPayed", EmojiParser.parseToUnicode(":mage:")));
     }
 
     @Override
     public BotState getHandlerName() {
-        return BotState.SHOW_HELP_MENU;
+        return BotState.SHOW_PAYED_MENU;
     }
 }
