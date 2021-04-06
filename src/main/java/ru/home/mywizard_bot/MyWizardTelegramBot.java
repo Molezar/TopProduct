@@ -72,7 +72,7 @@ public class MyWizardTelegramBot extends TelegramWebhookBot {
 
     @SneakyThrows
     public void sendPhoto(long chatId, String imageCaption, String imagePath) throws FileNotFoundException, TelegramApiException {
-        File image = ResourceUtils.getFile("classpath:" + imagePath);
+        File image = ResourceUtils.getFile("https://presstelegrambot.herokuapp.com/" + imagePath);
         SendPhoto sendPhoto = new SendPhoto().setPhoto(image);
         sendPhoto.setChatId(chatId);
         sendPhoto.setCaption(imageCaption);
