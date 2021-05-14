@@ -73,7 +73,7 @@ public class TelegramFacade {
         switch (inputMsg) {
             case "/start":
                 botState = BotState.ASK_DESTINY;
-                myWizardBot.sendPhoto(chatId, messagesService.getReplyText("reply.hello"), "static/images/press.jpg");
+                myWizardBot.sendPhoto(chatId, messagesService.getReplyText("reply.hello"), "static/images/top.jpg");
                 break;
             case "Заполнить данные для доставки":
                 botState = BotState.FILLING_PROFILE;
@@ -114,8 +114,8 @@ public class TelegramFacade {
         } else if (buttonQuery.getData().equals("buttonNo")) {
             callBackAnswer = sendAnswerCallbackQuery("Тогда иди гуляй", false, buttonQuery);
         } else if (buttonQuery.getData().equals("buttonIwillThink")) {
-            callBackAnswer = sendAnswerCallbackQuery("Чтобы лучше думалось посмотри на это", true, buttonQuery);
-            myWizardBot.sendPhoto(chatId, messagesService.getReplyText("reply.rosin"), "static/images/rosin.jpg");
+            callBackAnswer = sendAnswerCallbackQuery("Пока ты думаешь другие уже подумали, а товара на складе все меньше!", true, buttonQuery);
+            myWizardBot.sendPhoto(chatId, messagesService.getReplyText("reply.podumali"), "static/images/podumali.jpg");
         }
 
         //From Country choose buttons
