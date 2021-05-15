@@ -87,6 +87,15 @@ public class MyWizardTelegramBot extends TelegramWebhookBot {
         sendDocument.setDocument(sendFile);
         execute(sendDocument);
     }
+    @SneakyThrows
+    public void sendDocumentToAdmin(long adminId, long chatId, String caption, File sendFile) throws TelegramApiException {
+        SendDocument sendDocument = new SendDocument();
+        sendDocument.setChatId(chatId);
+        sendDocument.setCaption(caption);
+        sendDocument.setDocument(sendFile);
+        execute(sendDocument);
+    }
+
 
 
 }

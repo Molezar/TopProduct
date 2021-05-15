@@ -66,6 +66,7 @@ public class TelegramFacade {
     private SendMessage handleInputMessage(Message message) throws IOException, TelegramApiException {
         String inputMsg = message.getText();
         int userId = message.getFrom().getId();
+
         long chatId = message.getChatId();
         BotState botState;
         SendMessage replyMessage;
@@ -73,7 +74,7 @@ public class TelegramFacade {
         switch (inputMsg) {
             case "/start":
                 botState = BotState.ASK_DESTINY;
-                myWizardBot.sendPhoto(chatId, messagesService.getReplyText("reply.hello"), "static/images/top.jpg");
+                myWizardBot.sendPhoto(chatId, messagesService.getReplyText("reply.hello"), "static/images/top.png");
                 break;
             case "Заполнить данные для доставки":
                 botState = BotState.FILLING_PROFILE;
@@ -115,7 +116,7 @@ public class TelegramFacade {
             callBackAnswer = sendAnswerCallbackQuery("Тогда иди гуляй", false, buttonQuery);
         } else if (buttonQuery.getData().equals("buttonIwillThink")) {
             callBackAnswer = sendAnswerCallbackQuery("Пока ты думаешь другие уже подумали, а товара на складе все меньше!", true, buttonQuery);
-            myWizardBot.sendPhoto(chatId, messagesService.getReplyText("reply.podumali"), "static/images/podumali.jpg");
+            myWizardBot.sendPhoto(chatId, messagesService.getReplyText("reply.podumali"), "static/images/podumali.png");
         }
 
         //From Country choose buttons
@@ -134,11 +135,7 @@ public class TelegramFacade {
         } else {
             userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_MAIN_MENU);
         }
-
-
         return callBackAnswer;
-
-
     }
 
 

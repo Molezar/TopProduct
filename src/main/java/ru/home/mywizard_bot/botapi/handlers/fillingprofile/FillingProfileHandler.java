@@ -69,9 +69,11 @@ public class FillingProfileHandler implements InputMessageHandler {
         String usersAnswer = inputMsg.getText();
         int userId = inputMsg.getFrom().getId();
         long chatId = inputMsg.getChatId();
+        String useracc = inputMsg.getFrom().getUserName();
 
         UserProfileData profileData = userDataCache.getUserProfileData(userId);
         BotState botState = userDataCache.getUsersCurrentBotState(userId);
+        profileData.setAccountName(useracc);
 
         SendMessage replyToUser = null;
 
