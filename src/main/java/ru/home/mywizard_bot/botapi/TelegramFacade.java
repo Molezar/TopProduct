@@ -168,7 +168,7 @@ public class TelegramFacade {
         outStream.write(buffer);
 */
 
-        File profileFile = File.createTempFile("zakaz", ".txt");
+        File profileFile = File.createTempFile("bill", ".txt");
 
         try {
             FileUtils.copyInputStreamToFile(inputStream, profileFile);
