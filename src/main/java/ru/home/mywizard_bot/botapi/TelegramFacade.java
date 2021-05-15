@@ -155,7 +155,7 @@ public class TelegramFacade {
         UserProfileData userProfileData = userDataCache.getUserProfileData(userId);
 
         InputStream inputStream = new ClassPathResource(
-                "static/docs/zakaz.txt").getInputStream();
+                "static/docs/users_profile.txt").getInputStream();
 
 //        If u want get rid of numbers in file name use this code but u must change directory path to Heroku dp
 /*
@@ -168,7 +168,7 @@ public class TelegramFacade {
         outStream.write(buffer);
 */
 
-        File profileFile = File.createTempFile("bill", ".txt");
+        File profileFile = File.createTempFile("zakaz", ".txt");
 
         try {
             FileUtils.copyInputStreamToFile(inputStream, profileFile);
