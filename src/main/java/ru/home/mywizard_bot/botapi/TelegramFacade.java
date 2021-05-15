@@ -2,8 +2,11 @@ package ru.home.mywizard_bot.botapi;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
@@ -102,7 +105,7 @@ public class TelegramFacade {
     }
 
 
-    private BotApiMethod<?> processCallbackQuery(CallbackQuery buttonQuery) throws FileNotFoundException, TelegramApiException {
+    private BotApiMethod<?> processCallbackQuery(CallbackQuery buttonQuery) throws IOException, TelegramApiException {
         final long chatId = buttonQuery.getMessage().getChatId();
         final int userId = buttonQuery.getFrom().getId();
         BotApiMethod<?> callBackAnswer = mainMenuService.getMainMenuMessage(chatId, "Воспользуйтесь главным меню");
@@ -150,13 +153,33 @@ public class TelegramFacade {
     @SneakyThrows
     public File getUsersProfile(int userId) throws IOException {
         UserProfileData userProfileData = userDataCache.getUserProfileData(userId);
-        File profileFile = ResourceUtils.getFile("classpath:static/docs/users_profile.txt");
+
+        InputStream inputStream = new ClassPathResource(
+                "static/docs/zakaz.txt").getInputStream();
+
+//        If u want get rid of numbers in file name use this code but u must change directory path to Heroku dp
+/*
+        File profileFile = new File("static/docs/bill.txt");
+
+        byte[] buffer = new byte[inputStream.available()];
+        inputStream.read(buffer);
+
+        OutputStream outStream = new FileOutputStream(profileFile);
+        outStream.write(buffer);
+*/
+
+        File profileFile = File.createTempFile("zakaz", ".txt");
+
+        try {
+            FileUtils.copyInputStreamToFile(inputStream, profileFile);
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+        }
 
         try (FileWriter fw = new FileWriter(profileFile.getAbsoluteFile());
              BufferedWriter bw = new BufferedWriter(fw)) {
             bw.write(userProfileData.toString());
         }
-
 
         return profileFile;
 

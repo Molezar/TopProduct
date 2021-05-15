@@ -2,6 +2,9 @@ package ru.home.mywizard_bot;
 
 
 import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ResourceUtils;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
@@ -15,6 +18,7 @@ import ru.home.mywizard_bot.botapi.TelegramFacade;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 
 public class MyWizardTelegramBot extends TelegramWebhookBot {
@@ -71,8 +75,17 @@ public class MyWizardTelegramBot extends TelegramWebhookBot {
     }
 
     @SneakyThrows
-    public void sendPhoto(long chatId, String imageCaption, String imagePath) throws FileNotFoundException, TelegramApiException {
-        File image = ResourceUtils.getFile("classpath:" + imagePath);
+    public void sendPhoto(long chatId, String imageCaption, String imagePath) throws IOException, TelegramApiException {
+
+        ClassPathResource classPathResource = new ClassPathResource(imagePath);
+        InputStream inputStream = classPathResource.getInputStream();
+        File image = File.createTempFile("image", ".png");
+        try {
+            FileUtils.copyInputStreamToFile(inputStream, image);
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+        }
+//        File image = ResourceUtils.getFile("jar:" + imagePath);
         SendPhoto sendPhoto = new SendPhoto().setPhoto(image);
         sendPhoto.setChatId(chatId);
         sendPhoto.setCaption(imageCaption);
