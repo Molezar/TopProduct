@@ -13,7 +13,6 @@ import ru.home.mywizard_bot.botapi.TelegramFacade;
 import ru.home.mywizard_bot.service.MainMenuService;
 import ru.home.mywizard_bot.service.ReplyMessagesService;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 
@@ -36,7 +35,7 @@ public class PayedMenuHandler implements InputMessageHandler {
     public SendMessage handle(Message message) throws IOException, TelegramApiException {
         int userId = message.getFrom().getId();
 
-        myWizardBot.sendPhoto(-504852965, messagesService.getReplyText("reply.admininform"), "static/images/podumali.png");
+        myWizardBot.sendPhoto(-504852965, messagesService.getReplyText("reply.adminInform"), "static/images/podumali.png");
         myWizardBot.sendDocument(-504852965, "Оплаченный заказ", telegramFacade.getUsersProfile(userId));
 
         return mainMenuService.getMainMenuMessage(message.getChatId(),
